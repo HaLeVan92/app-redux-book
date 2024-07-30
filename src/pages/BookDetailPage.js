@@ -7,13 +7,12 @@ import { Container, Button, Box, Grid, Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { updateBookDetail } from "../features/books/booksSlice";
 
-
 const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
 const BookDetailPage = () => {
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch()
-  const book = useSelector(state => state.books.bookDetail)
+  const dispatch = useDispatch();
+  const book = useSelector((state) => state.books.bookDetail);
   const [addingBook, setAddingBook] = useState(false);
   const params = useParams();
   const bookId = params.id;
@@ -42,24 +41,31 @@ const BookDetailPage = () => {
       setLoading(true);
       try {
         const res = await api.get(`/books/${bookId}`);
-        const data = res.data
-        dispatch(updateBookDetail(data))
+        const data = res.data;
+        dispatch(updateBookDetail(data));
       } catch (error) {
         toast.error(error.message);
       }
       setLoading(false);
     };
     fetchData();
+    // eslint-disable-next-line
   }, [bookId]);
 
   return (
     <Container>
       {loading ? (
-        <Box sx={{ textAlign: "center", color: "primary.main" }} >
+        <Box sx={{ textAlign: "center", color: "primary.main" }}>
           <ClipLoader color="#inherit" size={150} loading={true} />
         </Box>
       ) : (
-        <Grid container spacing={2} p={4} mt={5} sx={{ border: "1px solid black" }}>
+        <Grid
+          container
+          spacing={2}
+          p={4}
+          mt={5}
+          sx={{ border: "1px solid black" }}
+        >
           <Grid item md={4}>
             {book && (
               <img
@@ -88,16 +94,19 @@ const BookDetailPage = () => {
                 <Typography variant="body1">
                   <strong>Language:</strong> {book.language}
                 </Typography>
-                <Button variant="outlined" sx={{ width: "fit-content" }} onClick={() => addToReadingList(book)}>
+                <Button
+                  variant="outlined"
+                  sx={{ width: "fit-content" }}
+                  onClick={() => addToReadingList(book)}
+                >
                   Add to Reading List
                 </Button>
               </Stack>
             )}
           </Grid>
         </Grid>
-      )
-      }
-    </Container >
+      )}
+    </Container>
   );
 };
 
