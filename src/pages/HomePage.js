@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 
-import api from "../apiService";
 import { FormProvider } from "../form";
 import { useForm } from "react-hook-form";
 import {
@@ -17,22 +16,21 @@ import {
   CardContent,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { updateBooks } from "../features/books/booksSlice";
+import { getBooks } from "../features/books/booksSlice";
 import PaginationBar from "../features/PaginationBar";
 import SearchForm from "../features/SearchForm";
 
 const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
 const HomePage = () => {
-  const books = useSelector((state) => state.books.data);
-  const totalPage = useSelector((state) => state.books.total);
-  const pageNum = useSelector((state) => state.books.page);
+  const { data, total, page, loading, errorMessage } = useSelector(
+    (state) => state.books
+  );
+
   const dispatch = useDispatch();
   const limit = 10;
 
-  const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
   const handleClickBook = (bookId) => {
@@ -41,23 +39,11 @@ const HomePage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      try {
-        let url = `/books?_page=${pageNum}&_limit=${limit}`;
-        if (query) url += `&q=${query}`;
-        const res = await api.get(url);
-        const data = res.data;
-
-        dispatch(updateBooks(data));
-        setErrorMessage("");
-      } catch (error) {
-        setErrorMessage(error.message);
-      }
-      setLoading(false);
+      dispatch(getBooks(page, limit, query));
     };
     fetchData();
     // eslint-disable-next-line
-  }, [pageNum, limit, query]);
+  }, [page, limit, query, dispatch]);
   //--------------form
   const defaultValues = {
     searchQuery: "",
@@ -87,7 +73,7 @@ const HomePage = () => {
             <SearchForm />
           </Stack>
         </FormProvider>
-        <PaginationBar pageNum={pageNum} totalPageNum={totalPage} />
+        <PaginationBar pageNum={page} totalPageNum={total} />
       </Stack>
       <div>
         {loading ? (
@@ -101,7 +87,7 @@ const HomePage = () => {
             justifyContent="space-around"
             flexWrap="wrap"
           >
-            {books.map((book) => (
+            {data?.map((book) => (
               <Card
                 key={book.id}
                 onClick={() => handleClickBook(book.id)}
