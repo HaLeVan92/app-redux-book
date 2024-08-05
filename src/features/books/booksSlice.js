@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import api from "../../apiService";
+import { toast } from "react-toastify";
 
 const initialState = {
   loading: false,
@@ -7,6 +8,7 @@ const initialState = {
   page: 1,
   total: 10,
   bookDetail: undefined,
+  addingBook: false,
 };
 
 export const booksSlice = createSlice({
@@ -33,6 +35,9 @@ export const booksSlice = createSlice({
     getBookSuccess: (state, action) => {
       state.loading = false;
       state.data = action.payload;
+    },
+    getaddingBook: (state, action) => {
+      state.addingBook = action.payload;
     },
   },
 });
@@ -61,5 +66,14 @@ export const getBooks = (pageNum, limit, query) => async (dispatch) => {
     console.log(error);
   }
 };
-
+export const getAddingBook = (addingBook) => async (dispatch) => {
+  try {
+    dispatch(isLoading());
+    await api.post(`/favorites`, addingBook);
+    toast.success("The book has been added to the reading list!");
+  } catch (error) {
+    toast.error(error.message);
+    console.log(error);
+  }
+};
 export default booksSlice.reducer;

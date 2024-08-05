@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import api from "../apiService";
 import { Container, Button, Box, Grid, Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { updateBookDetail } from "../features/books/booksSlice";
+import { getAddingBook, updateBookDetail } from "../features/books/booksSlice";
 
 const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
@@ -23,15 +23,16 @@ const BookDetailPage = () => {
 
   useEffect(() => {
     const postData = async () => {
-      if (!addingBook) return;
-      setLoading(true);
-      try {
-        await api.post(`/favorites`, addingBook);
-        toast.success("The book has been added to the reading list!");
-      } catch (error) {
-        toast.error(error.message);
-      }
-      setLoading(false);
+      // if (!addingBook) return;
+      // setLoading(true);
+      // try {
+      //   await api.post(`/favorites`, addingBook);
+      //   toast.success("The book has been added to the reading list!");
+      // } catch (error) {
+      //   toast.error(error.message);
+      // }
+      // setLoading(false);
+      dispatch(getAddingBook(addingBook));
     };
     postData();
   }, [addingBook]);
