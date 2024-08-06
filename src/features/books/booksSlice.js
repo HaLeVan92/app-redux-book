@@ -9,6 +9,7 @@ const initialState = {
   total: 10,
   bookDetail: undefined,
   addingBook: false,
+  errorMessage: "",
 };
 
 export const booksSlice = createSlice({
@@ -36,8 +37,9 @@ export const booksSlice = createSlice({
       state.loading = false;
       state.data = action.payload;
     },
-    getaddingBook: (state, action) => {
-      state.addingBook = action.payload;
+    getBookDetailSuccess: (state, action) => {
+      state.loading = false;
+      state.errorMessage = "";
     },
   },
 });
@@ -50,6 +52,7 @@ export const {
   getBookSuccess,
   isLoading,
   hasError,
+  getBookDetailSuccess,
 } = booksSlice.actions;
 
 export const getBooks = (pageNum, limit, query) => async (dispatch) => {
@@ -68,9 +71,19 @@ export const getBooks = (pageNum, limit, query) => async (dispatch) => {
 };
 export const getAddingBook = (addingBook) => async (dispatch) => {
   try {
-    dispatch(isLoading());
     await api.post(`/favorites`, addingBook);
     toast.success("The book has been added to the reading list!");
+  } catch (error) {
+    toast.error(error.message);
+    console.log(error);
+  }
+};
+export const getBookDetail = (bookId) => async (dispatch) => {
+  try {
+    dispatch(isLoading());
+    const res = await api.get(`/books/${bookId}`);
+    const data = res.data;
+    dispatch(getBookDetailSuccess(data));
   } catch (error) {
     toast.error(error.message);
     console.log(error);
